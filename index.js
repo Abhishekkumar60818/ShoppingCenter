@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 const { createProduct } = require('./controller/Product');
 const productsRouter = require('./routes/Products');
 const categoriesRouter = require('./routes/Categories');
@@ -24,6 +25,26 @@ const { isAuth, sanitizeUser, cookieExtractor } = require('./services/common');
 const path = require('path');
 
 console.log(process.env)
+
+//Email
+let transporter = nodemailer.createTransport({
+  host:"smtp.gmail.com",
+  port:587,
+  secure:false,
+  auth:{
+    user:'abhishekkumar65856@gmail.com',
+    pass:process.env.MAIL_PASSWORD,
+  },
+});
+
+//send mail with defined transport object 
+
+
+
+
+
+
+
 
 // Webhook
 
@@ -98,6 +119,17 @@ server.use('/users', isAuth(), usersRouter.router);
 server.use('/auth', authRouter.router);
 server.use('/cart', isAuth(), cartRouter.router);
 server.use('/orders', isAuth(), ordersRouter.router);
+server.post('/mail',async (req,res)=>{
+  const {to}=req.body;
+  let info = await transporter.sendMail({
+    from:'"E-commerece"<order@ecommerce.com>',
+    to:to,
+    subject:"Hello ",
+    text:"Hello world?",
+    html:"<b>Hello word</b>",
+   });
+   res.json(info)
+})
 //this line we add to make react router work incase of other routes doesnot match
 server.get('*',(req,res)=> res.sendFile(path.resolve('build','index.html')));
 // Passport Strategies
